@@ -32,7 +32,10 @@ def main(argv: list[str] | None = None) -> int:
 
     if not creds_path.exists():
         print(f"ERROR: {creds_path} not found.", file=sys.stderr)
-        print("Put your downloaded Desktop OAuth client there (rename to credentials.json).", file=sys.stderr)
+        print(
+            "Put your downloaded Desktop OAuth client there (rename to credentials.json).",
+            file=sys.stderr,
+        )
         return 2
 
     sender = GmailSender(creds_path, token_path)
@@ -45,7 +48,9 @@ def main(argv: list[str] | None = None) -> int:
             mid = sender.send(me, f"{email['subject_prefix']} OAuth self-test", {"hello": body})
             print(f"OK: sent test email id={mid} to {me}")
         else:
-            did = sender.create_draft(_self_address(sender), f"{email['subject_prefix']} OAuth test", body)
+            did = sender.create_draft(
+                _self_address(sender), f"{email['subject_prefix']} OAuth test", body
+            )
             print(f"OK: created Gmail draft id={did} (nothing sent).")
         print(f"token cached at: {token_path}")
         print("You can now set email.enabled: true in config.yaml.")
