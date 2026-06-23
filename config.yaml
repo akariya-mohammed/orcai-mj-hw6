@@ -74,7 +74,7 @@ bonus:
 
 # Email reporting (Gmail API). Body is pure JSON per the assignment spec.
 email:
-  enabled: false                       # set true once OAuth is configured.
+  enabled: true                        # OAuth configured (secrets/token.json present).
   to: rmisegal+uoh26b@gmail.com
   subject_prefix: "[HW6 Cops&Robbers]"
   credentials_path: secrets/credentials.json   # Google OAuth client (gitignored).
