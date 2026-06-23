@@ -127,7 +127,11 @@ def main() -> None:
     print("wrote", sample_log)
     print("wrote", out["report_file"])
 
-    status = send_report(cfg, out["report"], subject_suffix="internal self-play result")
+    # ALWAYS dry-run here — artefact generation must never send a real email
+    # (especially not to the lecturer). The dry-run writes artefacts/email_dry_run.json.
+    status = send_report(
+        cfg, out["report"], subject_suffix="internal self-play result", dry_run=True
+    )
     print("email dry-run ->", status.get("saved"))
 
 
