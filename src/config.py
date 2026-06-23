@@ -99,4 +99,8 @@ def load_config(path: str | Path | None = None) -> AppConfig:
     for section in ("game", "scoring", "strategy", "llm"):
         if section not in raw:
             raise ConfigError(f"config.yaml missing required section: [{section}]")
+    # Optional ops override, e.g. run a server with HW6_LLM_PROVIDER=mock.
+    provider_override = os.environ.get("HW6_LLM_PROVIDER")
+    if provider_override:
+        raw["llm"]["provider"] = provider_override
     return AppConfig(raw=raw)

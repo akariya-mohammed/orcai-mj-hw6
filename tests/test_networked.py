@@ -1,0 +1,33 @@
+import asyncio
+
+import pytest
+
+# The networked path needs FastMCP; skip cleanly where it isn't installed (e.g. CI).
+pytest.importorskip("fastmcp")
+
+from src.client.networked import run_networked_match  # noqa: E402
+from src.engine.game import Role  # noqa: E402
+from src.servers.app import build_mcp_server  # noqa: E402
+
+
+def test_networked_selftest_over_inmemory(cfg):
+    cop_srv, _ = build_mcp_server(Role.COP, cfg)
+    thief_srv, _ = build_mcp_server(Role.THIEF, cfg)
+    out = asyncio.run(
+        run_networked_match(
+            cfg,
+            our_cop=cop_srv,
+            our_thief=thief_srv,
+            opp_cop=cop_srv,
+            opp_thief=thief_srv,
+            tokens={"our_cop": "", "our_thief": "", "opp_cop": "", "opp_thief": ""},
+            opponent_meta={"group_code": "selftest"},
+        )
+    )
+    assert out["summary"]["num_sub_games"] == 6
+    assert out["report"]["report_type"] == "bonus_game"
+    assert set(out["totals_by_group"]) == {"group_1", "group_2"}
+    assert out["bonus_claim"] in ("group_1", "group_2", "tie")
+    # every sub-game finished with a valid outcome
+    for sg in out["summary"]["sub_games"]:
+        assert sg["outcome"] in ("cop_win", "thief_win")

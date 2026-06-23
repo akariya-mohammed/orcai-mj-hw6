@@ -82,6 +82,29 @@ python -m src.servers.thief_server    # serves http://127.0.0.1:8766/mcp
 Each tool requires the matching bearer **token**, so a public URL can't be driven
 by a stranger.
 
+### Cross-group bonus match (the 10-pt path)
+
+The networked orchestrator plays a full 6-microgame match across MCP **URLs** —
+3 sub-games as cop (our cop vs the partner's thief), 3 as thief — and emits the
+**bonus** JSON (`artefacts/bonus_report.json`).
+
+```bash
+# Offline proof (no partner, no network): play against our own in-process servers
+python -m src.client.networked --selftest --provider mock
+
+# Real match vs a partner group (they give you their two MCP URLs + a token):
+#   set OPPONENT_MCP_TOKEN in .env, then:
+python -m src.client.networked \
+  --our-cop-url   http://127.0.0.1:8765/mcp \
+  --our-thief-url http://127.0.0.1:8766/mcp \
+  --opp-cop-url   https://PARTNER/cop/mcp \
+  --opp-thief-url https://PARTNER/thief/mcp
+```
+
+To expose your local servers to a partner, tunnel each port (e.g.
+`ngrok http 8765`) and share the two HTTPS URLs + your tokens. Both groups must
+email **agreeing** results — the bonus report carries `mutual_agreement: true`.
+
 ---
 
 ## What using it looks like (UI/UX)

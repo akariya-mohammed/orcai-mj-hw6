@@ -1,0 +1,104 @@
+{
+  "report_type": "bonus_game",
+  "timezone": "Asia/Jerusalem",
+  "generated_at": "2026-06-23T20:27:26",
+  "grid_size": [
+    5,
+    5
+  ],
+  "groups": {
+    "group_1": "orcai-mj",
+    "group_2": "selftest"
+  },
+  "group_names": {
+    "group_1": "orcai-mj",
+    "group_2": ""
+  },
+  "github_repo_group_1": "https://github.com/akariya-mohammed/orcai-mj-hw6",
+  "github_repo_group_2": "",
+  "students_group_1": [
+    {
+      "name": "Mohammad Akariya",
+      "id": "211862024"
+    },
+    {
+      "name": "Jude Khleif",
+      "id": "325233633"
+    }
+  ],
+  "students_group_2": [],
+  "mcp_url_group_1_cop": "",
+  "mcp_url_group_1_thief": "",
+  "mcp_url_group_2_cop": "",
+  "mcp_url_group_2_thief": "",
+  "our_role_schedule": [
+    "cop",
+    "cop",
+    "cop",
+    "thief",
+    "thief",
+    "thief"
+  ],
+  "sub_games": [
+    {
+      "index": 1,
+      "outcome": "cop_win",
+      "cop_points": 20,
+      "thief_points": 5,
+      "rounds": 13,
+      "our_role": "cop",
+      "our_points": 20
+    },
+    {
+      "index": 2,
+      "outcome": "cop_win",
+      "cop_points": 20,
+      "thief_points": 5,
+      "rounds": 5,
+      "our_role": "cop",
+      "our_points": 20
+    },
+    {
+      "index": 3,
+      "outcome": "cop_win",
+      "cop_points": 20,
+      "thief_points": 5,
+      "rounds": 4,
+      "our_role": "cop",
+      "our_points": 20
+    },
+    {
+      "index": 4,
+      "outcome": "cop_win",
+      "cop_points": 20,
+      "thief_points": 5,
+      "rounds": 4,
+      "our_role": "thief",
+      "our_points": 5
+    },
+    {
+      "index": 5,
+      "outcome": "cop_win",
+      "cop_points": 20,
+      "thief_points": 5,
+      "rounds": 11,
+      "our_role": "thief",
+      "our_points": 5
+    },
+    {
+      "index": 6,
+      "outcome": "cop_win",
+      "cop_points": 20,
+      "thief_points": 5,
+      "rounds": 6,
+      "our_role": "thief",
+      "our_points": 5
+    }
+  ],
+  "totals_by_group": {
+    "group_1": 75,
+    "group_2": 75
+  },
+  "bonus_claim": "tie",
+  "mutual_agreement": true
+}
