@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies + tooling
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyyaml numpy matplotlib python-dotenv pytest ruff black
+      - name: Lint (ruff)
+        run: ruff check src tests
+      - name: Format check (black)
+        run: black --check src tests
+      - name: Unit tests (pytest)
+        run: pytest
+        env:
+          # Tests force the 'mock' LLM provider, so no network / keys are needed.
+          MPLBACKEND: Agg
