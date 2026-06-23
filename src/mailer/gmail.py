@@ -1,0 +1,95 @@
+"""Send the result report by e-mail via the Gmail API.
+
+Auth follows Dr. Segal's guide: a Desktop OAuth client (``credentials.json``)
+plus a cached ``token.json`` (scope ``gmail.modify``). Both live under
+``secrets/`` and are gitignored — secrets never reach the repo.
+
+The message *body is the report JSON itself* (no free text), per the spec, so the
+lecturer's agent can parse and compare both groups' results automatically.
+
+Imports of the Google libraries are lazy so the module loads (and the rest of the
+project runs / tests) even when those packages aren't installed.
+"""
+
+from __future__ import annotations
+
+import base64
+import json
+from email.mime.text import MIMEText
+from pathlib import Path
+from typing import Any
+
+SCOPES = ["https://www.googleapis.com/auth/gmail.modify"]
+
+
+class GmailSender:
+    def __init__(self, credentials_path: str | Path, token_path: str | Path) -> None:
+        self.credentials_path = Path(credentials_path)
+        self.token_path = Path(token_path)
+        self._service = None
+
+    def _build_service(self):  # pragma: no cover - requires Google libs + OAuth
+        from google.auth.transport.requests import Request
+        from google.oauth2.credentials import Credentials
+        from google_auth_oauthlib.flow import InstalledAppFlow
+        from googleapiclient.discovery import build
+
+        creds = None
+        if self.token_path.exists():
+            creds = Credentials.from_authorized_user_file(str(self.token_path), SCOPES)
+        if not creds or not creds.valid:
+            if creds and creds.expired and creds.refresh_token:
+                creds.refresh(Request())
+            else:
+                if not self.credentials_path.exists():
+                    raise FileNotFoundError(
+                        f"OAuth client not found: {self.credentials_path}. "
+                        "Create a Desktop OAuth client per the Google API guide."
+                    )
+                flow = InstalledAppFlow.from_client_secrets_file(str(self.credentials_path), SCOPES)
+                creds = flow.run_local_server(port=0)
+            self.token_path.parent.mkdir(parents=True, exist_ok=True)
+            self.token_path.write_text(creds.to_json(), encoding="utf-8")
+        return build("gmail", "v1", credentials=creds)
+
+    def send(self, to: str, subject: str, json_body: dict[str, Any]) -> str:  # pragma: no cover
+        if self._service is None:
+            self._service = self._build_service()
+        body_text = json.dumps(json_body, ensure_ascii=False, indent=2)
+        message = MIMEText(body_text, "plain", "utf-8")
+        message["to"] = to
+        message["subject"] = subject
+        raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+        sent = self._service.users().messages().send(userId="me", body={"raw": raw}).execute()
+        return sent.get("id", "")
+
+
+def send_report(
+    cfg,
+    json_body: dict[str, Any],
+    *,
+    subject_suffix: str = "",
+    dry_run: bool | None = None,
+) -> dict[str, Any]:
+    """Send (or, in dry-run, just render) the JSON report.
+
+    Returns a small status dict. Dry-run writes the body to ``artefacts/`` and is
+    the default whenever ``email.enabled`` is false, so CI and tests never send.
+    """
+    email = cfg.email
+    if dry_run is None:
+        dry_run = not email.get("enabled", False)
+
+    subject = f"{email.get('subject_prefix', '[HW6]')} {subject_suffix}".strip()
+    to = email["to"]
+    body_text = json.dumps(json_body, ensure_ascii=False, indent=2)
+
+    if dry_run:
+        out = cfg.path("artefacts") / "email_dry_run.json"
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(body_text, encoding="utf-8")
+        return {"sent": False, "dry_run": True, "to": to, "subject": subject, "saved": str(out)}
+
+    sender = GmailSender(email["credentials_path"], email["token_path"])
+    msg_id = sender.send(to, subject, json_body)
+    return {"sent": True, "dry_run": False, "to": to, "subject": subject, "message_id": msg_id}
