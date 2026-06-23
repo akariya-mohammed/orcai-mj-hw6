@@ -153,18 +153,25 @@ as thief, so points flow to us when **our cop captures** (20) and **our thief
 survives** (10). Measured win-rates ([benchmark.py](src/strategy/benchmark.py),
 `python -m src.strategy.benchmark`):
 
-| board | our minimax cop vs heuristic thief | heuristic cop vs our thief (survival) |
-| --- | --- | --- |
-| 5×5 (default) | 100% capture | **0% survive** → both groups tie 75–75 |
-| 8×8 | 100% capture | ~30% survive |
-| 10×10 | 100% capture | ~40% survive |
+| board | our **cop** (minimax) catches their thief | our **thief** survives a *heuristic* cop | our thief vs a *minimax* cop |
+| --- | --- | --- | --- |
+| 5×5 (default) | 100% | 0% (structural tie) | 0% |
+| 8×8 | 100% | ~38% | 0% |
+| 10×10 | 100% | ~60% | 0% |
 
-**On the default 5×5 the thief cannot survive a competent cop, so two strong
-groups always tie (5 bonus pts each).** To win the full 10, agree with the partner
-on a larger board (`game.grid_size` in config — the lecturer permits extending
-rules by mutual agreement): there our minimax cop still captures ~100% (their
-thief dies → they score 5) while our thief survives often (we score 10s) → we win.
-Default config: **`cop: minimax`, `thief: heuristic`** (the strongest combo).
+Reading it: with king (8-direction) moves an optimal cop provably catches the
+robber, and capture time grows with board size. So **5×5 is always cop-win → two
+competent groups tie 75–75 (5 bonus pts each)**. The win comes from a **bigger
+board where skill decides**: our minimax cop still captures ~100% within 25 (even
+at 15×15), so the opponent's thief always dies (they score 5), while our
+area-control thief survives a *heuristic* cop often (we score 10s) → **we win vs a
+typical opponent**. Against an equally-optimal (minimax) opponent it is a 75–75
+tie — the best achievable against optimal play.
+
+**To win the bonus:** agree with the partner on a medium/large board (set
+`game.grid_size`, e.g. `[10, 10]` — the lecturer permits extending rules by mutual
+agreement). Default strategy config: **`cop: minimax`, `thief: heuristic`** (the
+strongest combo; minimax was *worse* as a thief).
 
 ---
 

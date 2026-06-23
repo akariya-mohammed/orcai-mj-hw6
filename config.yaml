@@ -77,7 +77,9 @@ bonus:
 # Email reporting (Gmail API). Body is pure JSON per the assignment spec.
 email:
   enabled: true                        # OAuth configured (secrets/token.json present).
-  to: rmisegal+uoh26b@gmail.com
+  to: rmisegal+uoh26b@gmail.com        # the lecturer (final submission target).
+  send_to_lecturer: false              # SAFETY GATE: while false, ALL sends go to your
+                                       # own inbox. Set true ONLY to do the real submission.
   subject_prefix: "[HW6 Cops&Robbers]"
   credentials_path: secrets/credentials.json   # Google OAuth client (gitignored).
   token_path: secrets/token.json                # cached OAuth token (gitignored).

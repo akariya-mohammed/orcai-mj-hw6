@@ -118,6 +118,13 @@ def send_report(
         return {"sent": False, "dry_run": True, "to": to, "subject": subject, "saved": str(out)}
 
     sender = GmailSender(email["credentials_path"], email["token_path"])
-    to = to_override or (sender.self_address() if to_self else email["to"])
+    # SAFETY GATE: never reach the lecturer unless explicitly allowed.
+    # Order: explicit --to override > --to-self > (lecturer only if send_to_lecturer) > self.
+    if to_override:
+        to = to_override
+    elif to_self or not email.get("send_to_lecturer", False):
+        to = sender.self_address()
+    else:
+        to = email["to"]
     msg_id = sender.send(to, subject, json_body)
     return {"sent": True, "dry_run": False, "to": to, "subject": subject, "message_id": msg_id}

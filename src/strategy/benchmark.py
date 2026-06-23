@@ -91,12 +91,14 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--depth", type=int, default=4)
     args = p.parse_args(argv)
 
+    # Our config: cop = minimax, thief = heuristic (area-control). These matchups
+    # show exactly the two roles we play, vs a weak (heuristic) and strong
+    # (minimax) opponent.
     kw = {"games": args.games, "grid": args.grid, "depth": args.depth}
     matchups = [
-        ("minimax", "heuristic", "OUR cop vs THEIR thief  (we play cop)"),
-        ("heuristic", "minimax", "THEIR cop vs OUR thief  (we play thief)"),
-        ("heuristic", "heuristic", "baseline: heuristic vs heuristic"),
-        ("minimax", "minimax", "minimax vs minimax"),
+        ("minimax", "heuristic", "OUR cop (minimax) catches their thief"),
+        ("heuristic", "heuristic", "OUR thief survives a HEURISTIC cop"),
+        ("minimax", "heuristic", "OUR thief survives a MINIMAX cop (strong group)"),
     ]
     print(
         f"\n=== Strategy tournament ({args.games} games, {args.grid}x{args.grid}, depth {args.depth}) ==="
