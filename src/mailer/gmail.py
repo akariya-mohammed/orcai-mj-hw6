@@ -52,16 +52,32 @@ class GmailSender:
             self.token_path.write_text(creds.to_json(), encoding="utf-8")
         return build("gmail", "v1", credentials=creds)
 
+    def _raw(self, to: str, subject: str, body_text: str) -> str:
+        message = MIMEText(body_text, "plain", "utf-8")
+        message["to"] = to
+        message["subject"] = subject
+        return base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+
     def send(self, to: str, subject: str, json_body: dict[str, Any]) -> str:  # pragma: no cover
         if self._service is None:
             self._service = self._build_service()
         body_text = json.dumps(json_body, ensure_ascii=False, indent=2)
-        message = MIMEText(body_text, "plain", "utf-8")
-        message["to"] = to
-        message["subject"] = subject
-        raw = base64.urlsafe_b64encode(message.as_bytes()).decode("utf-8")
+        raw = self._raw(to, subject, body_text)
         sent = self._service.users().messages().send(userId="me", body={"raw": raw}).execute()
         return sent.get("id", "")
+
+    def create_draft(self, to: str, subject: str, body_text: str) -> str:  # pragma: no cover
+        """Create a Gmail *draft* (does not send) — used to verify OAuth safely."""
+        if self._service is None:
+            self._service = self._build_service()
+        raw = self._raw(to, subject, body_text)
+        draft = (
+            self._service.users()
+            .drafts()
+            .create(userId="me", body={"message": {"raw": raw}})
+            .execute()
+        )
+        return draft.get("id", "")
 
 
 def send_report(
