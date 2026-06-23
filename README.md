@@ -105,6 +105,12 @@ To expose your local servers to a partner, tunnel each port (e.g.
 `ngrok http 8765`) and share the two HTTPS URLs + your tokens. Both groups must
 email **agreeing** results — the bonus report carries `mutual_agreement: true`.
 
+**Before playing another group, agree the protocol:** see
+[docs/INTEROP.md](docs/INTEROP.md) for the full interop contract (game params,
+the 4-tool MCP API, the turn loop, connectivity) and
+[docs/partner_message.md](docs/partner_message.md) for a paste-ready message to
+send them.
+
 ---
 
 ## What using it looks like (UI/UX)
