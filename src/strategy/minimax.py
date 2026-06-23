@@ -40,6 +40,24 @@ def evaluate(sub: SubGame) -> float:
     return -10.0 * dist - 2.0 * thief_mobility - 1.5 * thief_edge
 
 
+def evaluate_thief(sub: SubGame) -> float:
+    """Board value from the THIEF's perspective (higher = better for the thief).
+
+    Not just the negation of the cop eval: the thief also values **running the
+    clock** (``move_count``) — surviving moves is the actual win condition — so a
+    depth-limited search prefers the line that delays capture longest.
+    """
+    if sub.status is Status.THIEF_WIN:
+        return _BIG + sub.move_count
+    if sub.status is Status.COP_WIN:
+        return -_BIG + 100.0 * sub.move_count  # delaying capture is strongly better
+
+    dist = chebyshev(sub.cop, sub.thief)
+    thief_mobility = len(sub.board.neighbors(sub.thief, free_only=True))
+    thief_edge = _nearest_edge_distance(sub, sub.thief)  # large = central = safe
+    return 10.0 * dist + 2.0 * thief_mobility + 1.5 * thief_edge + 5.0 * sub.move_count
+
+
 def _ordered_moves(sub: SubGame, role: Role) -> list[Move]:
     moves = sub.legal_moves(role)
     # Move ordering helps alpha-beta: cop tries closing moves first, thief fleeing.
@@ -50,26 +68,27 @@ def _ordered_moves(sub: SubGame, role: Role) -> list[Move]:
     return moves
 
 
-def _search(sub: SubGame, depth: int, alpha: float, beta: float) -> float:
+def _search(sub: SubGame, depth: int, alpha: float, beta: float, max_role: Role, eval_fn) -> float:
+    """Alpha-beta where ``max_role`` maximizes ``eval_fn`` and the other side minimizes."""
     if sub.status is not Status.PLAYING or depth == 0:
-        return evaluate(sub)
+        return eval_fn(sub)
 
-    if sub.turn is Role.COP:  # maximizing
+    if sub.turn is max_role:  # maximizing player's turn
         best = -math.inf
-        for m in _ordered_moves(sub, Role.COP):
+        for m in _ordered_moves(sub, sub.turn):
             child = sub.clone()
-            child.apply(Role.COP, m, validate=False)
-            best = max(best, _search(child, depth - 1, alpha, beta))
+            child.apply(sub.turn, m, validate=False)
+            best = max(best, _search(child, depth - 1, alpha, beta, max_role, eval_fn))
             alpha = max(alpha, best)
             if alpha >= beta:
                 break
         return best
-    else:  # thief minimizing
+    else:  # opponent minimizes the maximizer's eval
         best = math.inf
-        for m in _ordered_moves(sub, Role.THIEF):
+        for m in _ordered_moves(sub, sub.turn):
             child = sub.clone()
-            child.apply(Role.THIEF, m, validate=False)
-            best = min(best, _search(child, depth - 1, alpha, beta))
+            child.apply(sub.turn, m, validate=False)
+            best = min(best, _search(child, depth - 1, alpha, beta, max_role, eval_fn))
             beta = min(beta, best)
             if alpha >= beta:
                 break
@@ -77,17 +96,19 @@ def _search(sub: SubGame, depth: int, alpha: float, beta: float) -> float:
 
 
 def best_move(sub: SubGame, role: Role, depth: int, rng: random.Random) -> Move:
-    """Pick ``role``'s best action by alpha-beta search to ``depth`` plies."""
-    moves = _ordered_moves(sub, role)
+    """Pick ``role``'s best action by alpha-beta search to ``depth`` plies.
+
+    Each role maximizes its *own* evaluation (cop: capture; thief: survive) — so
+    minimax is strong in both roles, not just the cop's.
+    """
+    eval_fn = evaluate if role is Role.COP else evaluate_thief
     scored: list[tuple[float, Move]] = []
-    maximizing = role is Role.COP
-    for m in moves:
+    for m in _ordered_moves(sub, role):
         child = sub.clone()
         child.apply(role, m, validate=False)
-        scored.append((_search(child, depth - 1, -math.inf, math.inf), m))
+        scored.append((_search(child, depth - 1, -math.inf, math.inf, role, eval_fn), m))
 
-    best_val = max(s for s, _ in scored) if maximizing else min(s for s, _ in scored)
-    # Tie-break randomly among equally-good moves for variety / unpredictability.
+    best_val = max(s for s, _ in scored)
     candidates = [m for s, m in scored if abs(s - best_val) < 1e-9]
     return rng.choice(candidates)
 

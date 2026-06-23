@@ -94,11 +94,15 @@ def main(argv: list[str] | None = None) -> int:
     # Our config: cop = minimax, thief = heuristic (area-control). These matchups
     # show exactly the two roles we play, vs a weak (heuristic) and strong
     # (minimax) opponent.
+    # Our config: cop = minimax, thief = heuristic (area-control). The last row
+    # shows why the thief is NOT minimax: minimax assumes an optimal opponent and
+    # under-exploits a heuristic cop, so it survives less than the area-control thief.
     kw = {"games": args.games, "grid": args.grid, "depth": args.depth}
     matchups = [
         ("minimax", "heuristic", "OUR cop (minimax) catches their thief"),
-        ("heuristic", "heuristic", "OUR thief survives a HEURISTIC cop"),
-        ("minimax", "heuristic", "OUR thief survives a MINIMAX cop (strong group)"),
+        ("heuristic", "heuristic", "OUR thief (area-control) vs a heuristic cop"),
+        ("minimax", "heuristic", "OUR thief vs a minimax cop (strong group)"),
+        ("heuristic", "minimax", "[ref] minimax-as-thief vs heuristic cop (worse)"),
     ]
     print(
         f"\n=== Strategy tournament ({args.games} games, {args.grid}x{args.grid}, depth {args.depth}) ==="
