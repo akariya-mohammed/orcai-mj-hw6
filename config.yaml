@@ -1,0 +1,96 @@
+# =============================================================================
+# HW6 — Cops & Robbers Dual-AI MCP Race — central configuration.
+# NOTHING is hard-coded in the source; every game parameter lives here.
+# =============================================================================
+
+game:
+  grid_size: [5, 5]        # rows, cols. Start small (e.g. [2, 2]) while debugging.
+  origin: 1                # board coordinates start at 1 (agreed convention).
+  max_moves: 25            # thief wins if uncaught after this many moves (per sub-game).
+  num_sub_games: 6         # a full game = 6 sub-games (3 as cop, 3 as thief).
+  max_barriers: 5          # cop may place at most this many barriers.
+  diagonal_moves: true     # all 8 directions allowed (incl. diagonal).
+  thief_moves_first: true  # turn order within a move.
+
+scoring:
+  cop_win: 20
+  thief_win: 10
+  cop_loss: 5
+  thief_loss: 5
+
+strategy:
+  cop: heuristic           # heuristic | qlearning
+  thief: heuristic         # heuristic | qlearning
+  qlearning:
+    learning_rate: 0.1     # alpha   (0.01 .. 0.5)
+    discount_factor: 0.9   # gamma   (0 .. 1)
+    epsilon: 0.2           # exploration rate for epsilon-greedy
+    train_episodes: 2000   # self-play episodes used to warm the Q-table
+  seed: 7                  # RNG seed for reproducible "random" start placement.
+
+# Large-language-model backend used by the MCP *client* to negotiate / interpret
+# the free natural-language conversation. The strategy itself is deterministic,
+# so a small local model is enough.
+llm:
+  provider: ollama         # ollama | anthropic | gemini | mock
+  temperature: 0.3
+  max_output_tokens: 600
+  max_tokens_budget: 400000  # hard token cap enforced by the gatekeeper.
+  watchdog_timeout: 180      # seconds before the hang kill-switch fires.
+
+providers:
+  ollama:
+    model: llama3.1:8b
+    base_url: http://127.0.0.1:11434   # local; never exposed to the internet.
+  anthropic:
+    model: claude-haiku-4-5            # cheap paid fallback (~$10-30 whole project).
+    api_key_env: ANTHROPIC_API_KEY
+  gemini:
+    model: gemini-2.0-flash
+    api_key_env: GEMINI_API_KEY
+  mock:
+    model: scripted                    # offline deterministic NL — for CI / tests.
+
+# MCP server endpoints. For local self-play these are localhost on separate ports.
+# For the cloud level, replace host with the public URL and set a real token.
+servers:
+  cop:
+    host: 127.0.0.1
+    port: 8765
+    token_env: COP_MCP_TOKEN           # bearer token; value lives in .env, never here.
+  thief:
+    host: 127.0.0.1
+    port: 8766
+    token_env: THIEF_MCP_TOKEN
+
+# Cross-group bonus game. Until a real partner is wired in, the orchestrator
+# plays against a second local instance that simulates the other group.
+bonus:
+  enabled: false
+  opponent:
+    cop_url: ""                        # other group's cop MCP URL
+    thief_url: ""                      # other group's thief MCP URL
+    token_env: OPPONENT_MCP_TOKEN
+
+# Email reporting (Gmail API). Body is pure JSON per the assignment spec.
+email:
+  enabled: false                       # set true once OAuth is configured.
+  to: rmisegal+uoh26b@gmail.com
+  subject_prefix: "[HW6 Cops&Robbers]"
+  credentials_path: secrets/credentials.json   # Google OAuth client (gitignored).
+  token_path: secrets/token.json                # cached OAuth token (gitignored).
+  timezone: Asia/Jerusalem
+
+identity:
+  group_code: orcai-mj
+  group_name: ""                       # TODO: confirm with teammate.
+  github_repo: "https://github.com/akariya-mohammed/orcai-mj-hw6"
+  members:
+    - name: Mohammad Akariya
+      id: "211862024"
+    - name: Jude Khleif
+      id: "325233633"
+
+paths:
+  logs: logs
+  artefacts: artefacts
