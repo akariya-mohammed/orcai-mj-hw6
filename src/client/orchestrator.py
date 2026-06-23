@@ -194,6 +194,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--grid", type=int, help="override grid size (square, e.g. 5)")
     parser.add_argument("--sub-games", type=int, help="override number of sub-games")
     parser.add_argument("--email", action="store_true", help="send the report by email (Gmail API)")
+    parser.add_argument(
+        "--to-self",
+        action="store_true",
+        help="send the email to your own Gmail (safe end-to-end test), not the lecturer",
+    )
+    parser.add_argument("--to", help="send the email to this explicit address")
     parser.add_argument("--log", help="path for the JSONL match log")
     args = parser.parse_args(argv)
 
@@ -230,7 +236,13 @@ def main(argv: list[str] | None = None) -> int:
     if args.email:
         from ..mailer import send_report
 
-        status = send_report(cfg, out["report"], subject_suffix="internal self-play result")
+        status = send_report(
+            cfg,
+            out["report"],
+            subject_suffix="internal self-play result",
+            to_override=args.to,
+            to_self=args.to_self,
+        )
         print(f"  email:  {status}")
     return 0
 

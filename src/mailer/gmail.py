@@ -66,6 +66,12 @@ class GmailSender:
         sent = self._service.users().messages().send(userId="me", body={"raw": raw}).execute()
         return sent.get("id", "")
 
+    def self_address(self) -> str:  # pragma: no cover - needs OAuth
+        """The authorized account's own email address (for safe self-tests)."""
+        if self._service is None:
+            self._service = self._build_service()
+        return self._service.users().getProfile(userId="me").execute().get("emailAddress", "me")
+
     def create_draft(self, to: str, subject: str, body_text: str) -> str:  # pragma: no cover
         """Create a Gmail *draft* (does not send) — used to verify OAuth safely."""
         if self._service is None:
@@ -86,26 +92,32 @@ def send_report(
     *,
     subject_suffix: str = "",
     dry_run: bool | None = None,
+    to_override: str | None = None,
+    to_self: bool = False,
 ) -> dict[str, Any]:
     """Send (or, in dry-run, just render) the JSON report.
 
     Returns a small status dict. Dry-run writes the body to ``artefacts/`` and is
     the default whenever ``email.enabled`` is false, so CI and tests never send.
+    ``to_self`` sends to the authorized account itself (safe end-to-end test);
+    ``to_override`` sends to an explicit address. Otherwise the configured
+    recipient (the lecturer) is used.
     """
     email = cfg.email
     if dry_run is None:
         dry_run = not email.get("enabled", False)
 
     subject = f"{email.get('subject_prefix', '[HW6]')} {subject_suffix}".strip()
-    to = email["to"]
     body_text = json.dumps(json_body, ensure_ascii=False, indent=2)
 
     if dry_run:
         out = cfg.path("artefacts") / "email_dry_run.json"
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(body_text, encoding="utf-8")
+        to = to_override or ("<self>" if to_self else email["to"])
         return {"sent": False, "dry_run": True, "to": to, "subject": subject, "saved": str(out)}
 
     sender = GmailSender(email["credentials_path"], email["token_path"])
+    to = to_override or (sender.self_address() if to_self else email["to"])
     msg_id = sender.send(to, subject, json_body)
     return {"sent": True, "dry_run": False, "to": to, "subject": subject, "message_id": msg_id}

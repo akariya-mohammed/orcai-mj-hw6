@@ -83,7 +83,7 @@ email:
 
 identity:
   group_code: orcai-mj
-  group_name: ""                       # TODO: confirm with teammate.
+  group_name: "orcai-mj"
   github_repo: "https://github.com/akariya-mohammed/orcai-mj-hw6"
   members:
     - name: Mohammad Akariya
