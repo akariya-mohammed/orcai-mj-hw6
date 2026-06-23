@@ -1,7 +1,7 @@
 {
   "report_type": "internal_self_play",
   "group_code": "orcai-mj",
-  "group_name": "",
+  "group_name": "orcai-mj",
   "github_repo": "https://github.com/akariya-mohammed/orcai-mj-hw6",
   "students": [
     {
@@ -16,13 +16,13 @@
   "cop_mcp_url": "http://127.0.0.1:8765/mcp",
   "thief_mcp_url": "http://127.0.0.1:8766/mcp",
   "timezone": "Asia/Jerusalem",
-  "generated_at": "2026-06-23T19:04:01",
+  "generated_at": "2026-06-23T20:44:03",
   "grid_size": [
     5,
     5
   ],
   "strategy": {
-    "cop": "heuristic",
+    "cop": "minimax",
     "thief": "heuristic"
   },
   "sub_games": [
@@ -31,7 +31,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 9,
+      "rounds": 3,
       "our_role": "cop",
       "our_points": 20
     },
@@ -40,7 +40,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 3,
+      "rounds": 1,
       "our_role": "cop",
       "our_points": 20
     },
@@ -49,7 +49,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 6,
+      "rounds": 3,
       "our_role": "cop",
       "our_points": 20
     },
@@ -58,7 +58,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 16,
+      "rounds": 3,
       "our_role": "thief",
       "our_points": 5
     },
@@ -67,7 +67,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 5,
+      "rounds": 3,
       "our_role": "thief",
       "our_points": 5
     },
@@ -76,7 +76,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 4,
+      "rounds": 1,
       "our_role": "thief",
       "our_points": 5
     }

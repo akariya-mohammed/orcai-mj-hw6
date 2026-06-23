@@ -11,6 +11,7 @@ from collections.abc import Callable
 
 from ..engine.game import Move, Role, SubGame
 from . import heuristic
+from .minimax import make_minimax
 from .qlearning import QConfig, QLearner
 
 DecideFn = Callable[[SubGame, Role], Move]
@@ -25,6 +26,10 @@ def make_decider(role: Role, cfg, *, rng: random.Random | None = None) -> Decide
 
     if kind == "heuristic":
         return heuristic.make_heuristic(role, rng)
+
+    if kind == "minimax":
+        depth = cfg.strategy.get("minimax", {}).get("depth", 4)
+        return make_minimax(role, depth, rng)
 
     if kind == "qlearning":
         rows, cols = cfg.game["grid_size"]
@@ -54,4 +59,4 @@ def make_decider(role: Role, cfg, *, rng: random.Random | None = None) -> Decide
     raise ValueError(f"unknown strategy kind for {role.value}: {kind!r}")
 
 
-__all__ = ["make_decider", "DecideFn", "QLearner", "QConfig", "heuristic"]
+__all__ = ["make_decider", "DecideFn", "QLearner", "QConfig", "heuristic", "make_minimax"]

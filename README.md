@@ -131,15 +131,40 @@ Committed artefacts (under [artefacts/](artefacts/)):
 
 ---
 
-## Strategy: heuristic + Reinforcement Learning
+## Strategy: minimax + heuristic + Reinforcement Learning
 
+Three interchangeable strategies (per role, in `config.yaml`):
+
+* **Minimax** ([minimax.py](src/strategy/minimax.py)) — depth-limited alpha-beta
+  adversarial search (the "brute-force" the lecturer pointed at). The cop
+  maximises a board evaluation (close distance, thief cornered, capture soon) and
+  plans barrier traps; the thief minimises it. **Our minimax cop captures ~100%.**
 * **Heuristic** ([heuristic.py](src/strategy/heuristic.py)) — cop greedily closes
-  Chebyshev distance and drops barriers on the thief's best escape; thief
-  maximises distance and mobility. Always legal; the RL fallback.
+  Chebyshev distance and barriers the thief's escape; thief stays far, central
+  (away from walls), and mobile. Fast, always legal, the search/RL fallback.
 * **Q-Learning** ([qlearning.py](src/strategy/qlearning.py)) — tabular Q over
-  state `(own cell, opponent cell)`, 8 movement actions, ε-greedy training by
-  self-play against the heuristic, Bellman update. Visualised as a Q-value
-  heatmap. Switch per role in `config.yaml` (`strategy.cop`, `strategy.thief`).
+  `(own cell, opponent cell)`, 8 actions, ε-greedy self-play training, Bellman
+  update; visualised as a Q-value heatmap.
+
+### How to actually win the bonus
+
+The bonus goes to the **higher-scoring group**. We play 3 sub-games as cop and 3
+as thief, so points flow to us when **our cop captures** (20) and **our thief
+survives** (10). Measured win-rates ([benchmark.py](src/strategy/benchmark.py),
+`python -m src.strategy.benchmark`):
+
+| board | our minimax cop vs heuristic thief | heuristic cop vs our thief (survival) |
+| --- | --- | --- |
+| 5×5 (default) | 100% capture | **0% survive** → both groups tie 75–75 |
+| 8×8 | 100% capture | ~30% survive |
+| 10×10 | 100% capture | ~40% survive |
+
+**On the default 5×5 the thief cannot survive a competent cop, so two strong
+groups always tie (5 bonus pts each).** To win the full 10, agree with the partner
+on a larger board (`game.grid_size` in config — the lecturer permits extending
+rules by mutual agreement): there our minimax cop still captures ~100% (their
+thief dies → they score 5) while our thief survives often (we score 10s) → we win.
+Default config: **`cop: minimax`, `thief: heuristic`** (the strongest combo).
 
 ---
 

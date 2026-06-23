@@ -1,7 +1,7 @@
 {
   "report_type": "bonus_game",
   "timezone": "Asia/Jerusalem",
-  "generated_at": "2026-06-23T20:27:26",
+  "generated_at": "2026-06-23T20:42:43",
   "grid_size": [
     5,
     5
@@ -45,7 +45,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 13,
+      "rounds": 3,
       "our_role": "cop",
       "our_points": 20
     },
@@ -54,7 +54,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 5,
+      "rounds": 1,
       "our_role": "cop",
       "our_points": 20
     },
@@ -63,7 +63,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 4,
+      "rounds": 2,
       "our_role": "cop",
       "our_points": 20
     },
@@ -72,7 +72,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 4,
+      "rounds": 2,
       "our_role": "thief",
       "our_points": 5
     },
@@ -81,7 +81,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 11,
+      "rounds": 2,
       "our_role": "thief",
       "our_points": 5
     },
@@ -90,7 +90,7 @@
       "outcome": "cop_win",
       "cop_points": 20,
       "thief_points": 5,
-      "rounds": 6,
+      "rounds": 3,
       "our_role": "thief",
       "our_points": 5
     }

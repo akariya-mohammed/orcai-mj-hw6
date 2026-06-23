@@ -19,8 +19,10 @@ scoring:
   thief_loss: 5
 
 strategy:
-  cop: heuristic           # heuristic | qlearning
-  thief: heuristic         # heuristic | qlearning
+  cop: minimax             # heuristic | minimax | qlearning  (minimax cop captures ~100%)
+  thief: heuristic         # heuristic | minimax | qlearning  (improved heuristic survives best)
+  minimax:
+    depth: 4               # search plies (2 full rounds). Higher = stronger but slower.
   qlearning:
     learning_rate: 0.1     # alpha   (0.01 .. 0.5)
     discount_factor: 0.9   # gamma   (0 .. 1)

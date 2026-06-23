@@ -106,13 +106,40 @@ class SubGame:
         return any(m.kind == move.kind and m.cell == move.cell for m in self.legal_moves(role))
 
     # --- transitions -------------------------------------------------------
-    def apply(self, role: Role, move: Move) -> None:
-        """Apply ``role``'s action, advance the turn, and update terminal status."""
+    def clone(self) -> SubGame:
+        """A cheap copy for look-ahead search (no history carried over)."""
+        board = Board(
+            self.board.rows,
+            self.board.cols,
+            origin=self.board.origin,
+            diagonal=self.board.diagonal,
+            barriers=set(self.board.barriers),
+        )
+        c = SubGame(
+            board=board,
+            cop=self.cop,
+            thief=self.thief,
+            max_moves=self.max_moves,
+            max_barriers=self.max_barriers,
+            barriers_left=self.barriers_left,
+            thief_moves_first=self.thief_moves_first,
+        )
+        c.move_count = self.move_count
+        c.status = self.status
+        c.turn = self.turn
+        return c
+
+    def apply(self, role: Role, move: Move, *, validate: bool = True) -> None:
+        """Apply ``role``'s action, advance the turn, and update terminal status.
+
+        ``validate=False`` skips the legality re-check — used by search, which only
+        ever applies moves it generated from :meth:`legal_moves`.
+        """
         if self.status is not Status.PLAYING:
             raise RuntimeError(f"sub-game already finished: {self.status}")
         if role is not self.turn:
             raise RuntimeError(f"not {role}'s turn (turn={self.turn})")
-        if not self.is_legal(role, move):
+        if validate and not self.is_legal(role, move):
             raise ValueError(f"illegal {role} action: {move.describe()}")
 
         if move.kind == "move":

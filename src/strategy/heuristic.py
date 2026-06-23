@@ -18,14 +18,30 @@ def _mobility(sub: SubGame, cell: tuple[int, int]) -> int:
     return len(sub.board.neighbors(cell, free_only=True))
 
 
+def _centrality(sub: SubGame, cell: tuple[int, int]) -> int:
+    """Distance to the nearest wall — higher = more central = harder to corner."""
+    b = sub.board
+    return min(cell[0] - b.origin, b.max_row - cell[0], cell[1] - b.origin, b.max_col - cell[1])
+
+
 def thief_decide(sub: SubGame, rng: random.Random) -> Move:
-    """Thief: maximise distance from the cop, breaking ties toward open space."""
+    """Thief: stay far from the cop, then central (away from walls), then mobile.
+
+    Centrality matters a lot for survival — a thief pinned against a wall or in a
+    corner loses escape directions and gets captured; staying central keeps the
+    most room to keep running for the full move limit.
+    """
     legal = [m for m in sub.legal_moves(Role.THIEF) if m.kind == "move"]
     if not legal:  # trapped — engine will score it as a capture
         raise RuntimeError("thief has no legal move")
 
-    def key(m: Move) -> tuple[int, int, float]:
-        return (chebyshev(m.cell, sub.cop), _mobility(sub, m.cell), rng.random())
+    def key(m: Move) -> tuple[int, int, int, float]:
+        return (
+            chebyshev(m.cell, sub.cop),
+            _centrality(sub, m.cell),
+            _mobility(sub, m.cell),
+            rng.random(),
+        )
 
     return max(legal, key=key)
 
