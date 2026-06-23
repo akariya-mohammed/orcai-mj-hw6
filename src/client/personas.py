@@ -20,13 +20,66 @@ from __future__ import annotations
 import logging
 import re
 
-from ..engine.board import delta_to_direction
+from ..engine.board import DIRECTIONS, delta_to_direction
 from ..engine.game import Move, Role, SubGame
 from .llm import BaseLLM
 
 logger = logging.getLogger(__name__)
 
-_COORD = re.compile(r"\(\s*(\d+)\s*,\s*(\d+)\s*\)")
+# Accept "(3, 4)", "3,4", "row 3 col 4", "r3 c4", "3 4" near a verb.
+_COORD_PATTERNS = [
+    re.compile(r"\(\s*(\d+)\s*,\s*(\d+)\s*\)"),
+    re.compile(r"\brow\s*(\d+)\D{0,6}col(?:umn)?\s*(\d+)", re.I),
+    re.compile(r"\br\s*(\d+)\D{0,4}c\s*(\d+)", re.I),
+    re.compile(r"(?:to|at|->|=>|cell)\s*\(?\s*(\d+)\s*[, ]\s*(\d+)", re.I),
+    re.compile(r"\b(\d+)\s*,\s*(\d+)\b"),
+]
+
+# Word/abbreviation -> canonical direction name.
+_DIR_WORDS = {
+    "north": "N",
+    "n": "N",
+    "up": "N",
+    "south": "S",
+    "s": "S",
+    "down": "S",
+    "east": "E",
+    "e": "E",
+    "right": "E",
+    "west": "W",
+    "w": "W",
+    "left": "W",
+    "northeast": "NE",
+    "north-east": "NE",
+    "ne": "NE",
+    "northwest": "NW",
+    "north-west": "NW",
+    "nw": "NW",
+    "southeast": "SE",
+    "south-east": "SE",
+    "se": "SE",
+    "southwest": "SW",
+    "south-west": "SW",
+    "sw": "SW",
+}
+_DIR_RE = re.compile(
+    r"\b(north-?east|north-?west|south-?east|south-?west|north|south|east|west|"
+    r"up|down|left|right|ne|nw|se|sw|[nsew])\b",
+    re.I,
+)
+
+
+def _find_coord(text: str) -> tuple[int, int] | None:
+    """Return the last coordinate mentioned (the destination / barrier cell)."""
+    best: tuple[int, int] | None = None
+    best_pos = -1
+    for pat in _COORD_PATTERNS:
+        for m in pat.finditer(text):
+            if m.start() > best_pos:
+                best_pos = m.start()
+                best = (int(m.group(1)), int(m.group(2)))
+    return best
+
 
 _COP_SYS = (
     "You are the COP agent in a cops-and-robbers grid game, talking to the thief "
@@ -96,22 +149,37 @@ class Persona:
             logger.warning("announce LLM failed (%s); using canonical text", exc)
             return canonical
         # Guarantee the coordinate + keyword survive for the interpreter.
-        if not _COORD.search(text) or (
-            "MOVE" not in text.upper() and "BARRIER" not in text.upper()
-        ):
+        if not _find_coord(text) or ("MOVE" not in text.upper() and "BARRIER" not in text.upper()):
             return canonical
         return text
 
     def interpret(self, text: str, sub: SubGame, mover: Role) -> Move | None:
-        """Read a sentence into a legal Move for ``mover`` (regex-validated)."""
-        coords = _COORD.findall(text)
-        if not coords:
-            logger.warning("interpret: no coordinates found in %r", text)
+        """Read a free-language sentence into a legal Move for ``mover``.
+
+        Robust to the *other group's* phrasing: tries several coordinate formats,
+        and if none are given falls back to a bare direction word relative to the
+        mover's current cell ("I move north"). Always validated against the rules.
+        """
+        kind = "barrier" if re.search(r"\b(barrier|block|wall)\b", text, re.I) else "move"
+
+        # 1) explicit coordinates in any supported format
+        cell = _find_coord(text)
+
+        # 2) fallback: a bare direction relative to the mover's current position
+        if cell is None:
+            m = _DIR_RE.search(text)
+            if m:
+                direction = _DIR_WORDS[m.group(1).lower().replace("-", "")]
+                base = sub.position(mover)
+                d_row, d_col = DIRECTIONS[direction]
+                cell = (base[0] + d_row, base[1] + d_col)
+
+        if cell is None:
+            logger.warning("interpret: no coordinates or direction in %r", text)
             return None
-        cell = (int(coords[-1][0]), int(coords[-1][1]))
-        kind = "barrier" if "BARRIER" in text.upper() or "BLOCK" in text.upper() else "move"
-        for m in sub.legal_moves(mover):
-            if m.kind == kind and m.cell == cell:
-                return m
+
+        for legal in sub.legal_moves(mover):
+            if legal.kind == kind and legal.cell == cell:
+                return legal
         logger.warning("interpret: %s %s at %s is not legal", mover.value, kind, cell)
         return None
