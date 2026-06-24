@@ -4,8 +4,8 @@
 # =============================================================================
 
 game:
-  grid_size: [5, 5]        # rows, cols. Start small (e.g. [2, 2]) while debugging.
-  origin: 1                # board coordinates start at 1 (agreed convention).
+  grid_size: [10, 10]      # bonus target: 10x10 makes the game DECISIVE (5x5 = forced tie).
+  origin: 0                # 0-based, agreed with the partner group (their internal base).
   max_moves: 25            # thief wins if uncaught after this many moves (per sub-game).
   num_sub_games: 6         # a full game = 6 sub-games (3 as cop, 3 as thief).
   max_barriers: 5          # cop may place at most this many barriers.
