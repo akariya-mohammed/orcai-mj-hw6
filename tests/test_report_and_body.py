@@ -40,6 +40,20 @@ def test_bonus_report_shape(cfg):
     assert report["groups"]["group_2"] == "other"
 
 
+def test_setup_accepts_board_override(cfg):
+    """Referee can switch board size per game (5x5 / 8x8 / official) without restart."""
+    from src.engine.game import Role
+    from src.servers.common import AgentBody
+
+    body = AgentBody(Role.COP, cfg)  # cfg default grid may be 10x10
+    out = body.setup(cop=[0, 0], thief=[4, 4], rows=5, cols=5, origin=0, max_barriers=3)
+    snap = out["snapshot"]
+    assert snap["thief"] == [4, 4]
+    assert body.sub.board.rows == 5 and body.sub.board.cols == 5
+    assert body.sub.board.origin == 0
+    assert body.sub.barriers_left == 3
+
+
 def test_loopback_match_is_complete_and_consistent(cfg):
     summary = run_loopback_match(cfg)
     assert summary["num_sub_games"] == cfg.game["num_sub_games"]

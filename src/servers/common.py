@@ -42,22 +42,46 @@ class AgentBody:
         self.sub = None  # type: ignore[assignment]
 
     # --- tool: setup -------------------------------------------------------
-    def setup(self, *, cop: list[int], thief: list[int]) -> dict[str, Any]:
+    def setup(
+        self,
+        *,
+        cop: list[int],
+        thief: list[int],
+        rows: int | None = None,
+        cols: int | None = None,
+        origin: int | None = None,
+        max_moves: int | None = None,
+        max_barriers: int | None = None,
+        diagonal: bool | None = None,
+        thief_moves_first: bool | None = None,
+    ) -> dict[str, Any]:
+        """Initialise this agent's world.
+
+        The board parameters default to ``config.yaml`` but can be **overridden by
+        the referee** — so one running server plays 5x5, 8x8, and the official
+        board in sequence (warm-ups → official) without a restart.
+        """
         g = self.cfg.game
         from ..engine.board import Board
         from ..engine.game import SubGame
 
-        board = Board(
-            g["grid_size"][0], g["grid_size"][1], origin=g["origin"], diagonal=g["diagonal_moves"]
-        )
+        rows = rows or g["grid_size"][0]
+        cols = cols or g["grid_size"][1]
+        origin = g["origin"] if origin is None else origin
+        diagonal = g["diagonal_moves"] if diagonal is None else diagonal
+        max_moves = max_moves or g["max_moves"]
+        max_barriers = g["max_barriers"] if max_barriers is None else max_barriers
+        thief_first = g["thief_moves_first"] if thief_moves_first is None else thief_moves_first
+
+        board = Board(rows, cols, origin=origin, diagonal=diagonal)
         self.sub = SubGame(
             board=board,
             cop=tuple(cop),
             thief=tuple(thief),
-            max_moves=g["max_moves"],
-            max_barriers=g["max_barriers"],
-            barriers_left=g["max_barriers"],
-            thief_moves_first=g["thief_moves_first"],
+            max_moves=max_moves,
+            max_barriers=max_barriers,
+            barriers_left=max_barriers,
+            thief_moves_first=thief_first,
         )
         return {"role": self.role.value, "snapshot": self.sub.snapshot()}
 

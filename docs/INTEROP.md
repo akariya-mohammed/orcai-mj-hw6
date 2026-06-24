@@ -27,10 +27,19 @@ Every call carries a bearer `token` (the value the server owner shares with you)
 
 | tool | input | returns |
 | --- | --- | --- |
-| `setup` | `cop:[r,c]`, `thief:[r,c]`, `token` | `{role, snapshot}` |
+| `setup` | `cop:[r,c]`, `thief:[r,c]`, *(optional)* `rows`,`cols`,`origin`,`max_moves`,`max_barriers`,`diagonal`, `token` | `{role, snapshot}` |
 | `my_move` | `token` | `{message, snapshot, status}` |
 | `observe` | `message:str`, `mover:"cop"\|"thief"`, `token` | `{snapshot, status}` |
 | `state` | `token` | `snapshot` |
+
+> **`setup` board params (important for the warm-up sequence).** The referee can
+> pass `rows`, `cols`, `origin`, `max_moves`, `max_barriers`, `diagonal` on each
+> `setup` call to set the board **per game** — so one running server plays the
+> 5×5 warm-up, the 8×8 warm-up, and the official board in sequence **without a
+> restart** (ngrok URLs stay stable). Omit them to use the server's config
+> defaults. Sentinels on the wire: `rows`/`cols`/`max_moves`=0 and
+> `origin`/`max_barriers`=-1 mean "use my default". Coordinates are **0-based
+> `[row, col]`**.
 
 `snapshot` shape:
 

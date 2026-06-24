@@ -37,10 +37,35 @@ def build_mcp_server(role: Role, cfg: AppConfig | None = None):
     mcp = FastMCP(name=f"hw6-{role.value}")
 
     @mcp.tool
-    def setup(cop: list[int], thief: list[int], token: str = "") -> dict:
-        """Initialise this agent's world with both start cells."""
+    def setup(
+        cop: list[int],
+        thief: list[int],
+        rows: int = 0,
+        cols: int = 0,
+        origin: int = -1,
+        max_moves: int = 0,
+        max_barriers: int = -1,
+        diagonal: bool = True,
+        token: str = "",
+    ) -> dict:
+        """Initialise this agent's world with both start cells.
+
+        Board params are optional — the referee may pass ``rows``/``cols``/
+        ``origin``/``max_moves``/``max_barriers`` to set the board per game
+        (warm-ups on different sizes, then the official board). Sentinels
+        (rows/cols/max_moves = 0, origin/max_barriers = -1) mean "use my config".
+        """
         _auth(token)
-        return body.setup(cop=cop, thief=thief)
+        return body.setup(
+            cop=cop,
+            thief=thief,
+            rows=rows or None,
+            cols=cols or None,
+            origin=None if origin < 0 else origin,
+            max_moves=max_moves or None,
+            max_barriers=None if max_barriers < 0 else max_barriers,
+            diagonal=diagonal,
+        )
 
     @mcp.tool
     def my_move(token: str = "") -> dict:
