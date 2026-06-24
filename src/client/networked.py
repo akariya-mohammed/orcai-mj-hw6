@@ -191,6 +191,30 @@ async def run_networked_match(
     }
 
 
+def _load_partner() -> dict[str, Any]:
+    """Load bonus_partner.local.json (the partner's details), ignoring placeholders.
+
+    The file is gitignored / local-only. Any value still left as a ``<...>``
+    placeholder is dropped, so a partly-filled file is safe to use.
+    """
+    import json
+
+    from ..config import PROJECT_ROOT
+
+    path = PROJECT_ROOT / "bonus_partner.local.json"
+    if not path.exists():
+        return {}
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError):
+        return {}
+    return {
+        k: v
+        for k, v in data.items()
+        if not (isinstance(v, str) and v.startswith("<") and v.endswith(">"))
+    }
+
+
 def _selftest_targets(cfg):
     """Build two in-process FastMCP servers (cop, thief) for an offline self-test."""
     from ..servers.app import build_mcp_server
@@ -227,15 +251,18 @@ def main(argv: list[str] | None = None) -> int:
     if args.provider:
         cfg.raw["llm"]["provider"] = args.provider
 
+    partner = _load_partner()  # bonus_partner.local.json (placeholders ignored)
+
     our_cop_tok = os.environ.get(cfg.servers["cop"]["token_env"], "")
     our_thief_tok = os.environ.get(cfg.servers["thief"]["token_env"], "")
     opp_tok = os.environ.get(cfg.bonus["opponent"].get("token_env", "OPPONENT_MCP_TOKEN"), "")
     tokens = {
         "our_cop": our_cop_tok,
         "our_thief": our_thief_tok,
-        # Partner token if provided; else fall back to ours (covers the self-over-HTTP test).
-        "opp_cop": opp_tok or our_cop_tok,
-        "opp_thief": opp_tok or our_thief_tok,
+        # Partner per-server token from the partner file, else a shared env token,
+        # else fall back to ours (covers the self-over-HTTP test).
+        "opp_cop": partner.get("partner_cop_token") or opp_tok or our_cop_tok,
+        "opp_thief": partner.get("partner_thief_token") or opp_tok or our_thief_tok,
     }
 
     if args.selftest:
@@ -251,10 +278,23 @@ def main(argv: list[str] | None = None) -> int:
     else:
         our_cop = args.our_cop_url or "http://{host}:{port}/mcp".format(**cfg.servers["cop"])
         our_thief = args.our_thief_url or "http://{host}:{port}/mcp".format(**cfg.servers["thief"])
-        opp_cop = args.opp_cop_url or cfg.bonus["opponent"].get("cop_url") or our_cop
-        opp_thief = args.opp_thief_url or cfg.bonus["opponent"].get("thief_url") or our_thief
+        opp_cop = (
+            args.opp_cop_url
+            or partner.get("partner_cop_mcp_url")
+            or cfg.bonus["opponent"].get("cop_url")
+            or our_cop
+        )
+        opp_thief = (
+            args.opp_thief_url
+            or partner.get("partner_thief_mcp_url")
+            or cfg.bonus["opponent"].get("thief_url")
+            or our_thief
+        )
         opponent_meta = {
-            "group_code": "partner",
+            "group_code": partner.get("partner_group_code", "partner"),
+            "group_name": partner.get("partner_group_slug", ""),
+            "github_repo": partner.get("partner_github_repo", ""),
+            "members": partner.get("partner_students_public", []),
             "cop_url": opp_cop,
             "thief_url": opp_thief,
             "our_cop_url": our_cop,

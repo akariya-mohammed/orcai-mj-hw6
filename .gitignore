@@ -4,6 +4,8 @@ secrets/
 *.token.json
 credentials.json
 token.json
+# bonus_partner.local.json — holds the partner's tokens/URLs
+*.local.json
 
 # --- Python ---
 .venv/
