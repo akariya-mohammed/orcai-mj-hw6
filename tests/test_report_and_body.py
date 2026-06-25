@@ -40,6 +40,38 @@ def test_bonus_report_shape(cfg):
     assert report["groups"]["group_2"] == "other"
 
 
+def test_compare_reports_match_and_mismatch():
+    from src.report.compare import compare
+
+    base = {
+        "grid_size": [8, 8],
+        "groups": {"group_1": "orcai-mj", "group_2": "other"},
+        "totals_by_group": {"group_1": 80, "group_2": 55},
+        "bonus_claim": "group_1",
+        "sub_games": [
+            {"index": 1, "outcome": "cop_win", "rounds": 5},
+            {"index": 2, "outcome": "thief_win", "rounds": 25},
+        ],
+    }
+    # Their report: same facts, but labelled from their perspective (group_1=other).
+    theirs = {
+        "grid_size": [8, 8],
+        "groups": {"group_1": "other", "group_2": "orcai-mj"},
+        "totals_by_group": {"group_1": 55, "group_2": 80},
+        "bonus_claim": "group_1",  # claim is by code mapping; outcomes drive agreement
+        "sub_games": [
+            {"index": 2, "outcome": "thief_win", "rounds": 25},
+            {"index": 1, "outcome": "cop_win", "rounds": 5},
+        ],
+    }
+    ok, _ = compare(base, theirs)
+    assert ok  # same outcomes + same totals-by-code => agree
+
+    conflicting = {**theirs, "sub_games": [{"index": 1, "outcome": "thief_win", "rounds": 25}]}
+    ok2, issues = compare(base, conflicting)
+    assert not ok2 and issues
+
+
 def test_setup_accepts_board_override(cfg):
     """Referee can switch board size per game (5x5 / 8x8 / official) without restart."""
     from src.engine.game import Role
