@@ -1,0 +1,408 @@
+{
+  "handoff_type": "bonus_game_canonical_result",
+  "from_group": "MaRs-777",
+  "for_partner_group": "orcai-mj",
+  "result_hash": "a0fdf72d1122280c3637d54f0bda5656c6c6c2b257220347d9675b405972ac68",
+  "instructions": "Recompute result_hash over your transcript of this match. If it matches, reply confirming; mutual_agreement is set only once both results match.",
+  "bonus_game": {
+    "report_type": "bonus_game",
+    "schema_version": "1.0",
+    "group_a": {
+      "group_code": "MaRs-777",
+      "group_slug": "mars777",
+      "students": [
+        {
+          "id": "REDACTED",
+          "name": "Mohamed Awad",
+          "first_name_en": "Mohamed",
+          "last_name_en": "Awad",
+          "first_name_he": "\u05de\u05d5\u05d7\u05de\u05d3",
+          "last_name_he": "\u05e2\u05d5\u05d0\u05d3"
+        },
+        {
+          "id": "REDACTED",
+          "name": "Rawey Sleiman",
+          "first_name_en": "Rawey",
+          "last_name_en": "Sleiman",
+          "first_name_he": "\u05e8\u05d0\u05d5\u05d5\u05d9",
+          "last_name_he": "\u05e1\u05d5\u05dc\u05d9\u05de\u05d0\u05df"
+        }
+      ]
+    },
+    "group_b": {
+      "group_code": "orcai-mj",
+      "group_slug": "orcai-mj",
+      "students": [
+        {
+          "name": "Mohammad Akariya",
+          "id": "REDACTED"
+        },
+        {
+          "name": "Jude Khleif",
+          "id": "REDACTED"
+        }
+      ]
+    },
+    "github_repos": {
+      "MaRs-777": "https://github.com/mohammedawad99/mars777-ex06-cop-thief-mcp",
+      "orcai-mj": "https://github.com/akariya-mohammed/orcai-mj-hw6"
+    },
+    "mcp_urls": {
+      "group_a_cop": "https://mars777-cop-mcp-6lhzzicqha-zf.a.run.app/mcp",
+      "group_a_thief": "https://mars777-thief-mcp-6lhzzicqha-zf.a.run.app/mcp",
+      "group_b_cop": "https://protected-soft-origins-correctly.trycloudflare.com/mcp",
+      "group_b_thief": "https://colon-constantly-nelson-visible.trycloudflare.com/mcp"
+    },
+    "timezone": "Asia/Jerusalem",
+    "official_rules": {
+      "board_size": [
+        8,
+        8
+      ],
+      "origin": 0,
+      "coordinate_format": "[row, col]",
+      "turn_order": [
+        "thief",
+        "cop"
+      ],
+      "num_sub_games": 6,
+      "max_moves": 25,
+      "max_barriers": 5,
+      "barriers_role": "cop",
+      "diagonal_movement": true,
+      "scoring": {
+        "cop_win": {
+          "cop": 20,
+          "thief": 5
+        },
+        "thief_win": {
+          "cop": 5,
+          "thief": 10
+        }
+      },
+      "max_moves_note": "25 plies total (thief-first); thief survival to the limit is a thief win."
+    },
+    "pairing": {
+      "set_a": "MaRs-777 Cop vs orcai-mj Thief",
+      "set_b": "orcai-mj Cop vs MaRs-777 Thief"
+    },
+    "sub_games": [
+      {
+        "sub_game_index": 0,
+        "pairing": "A",
+        "cop_group": "MaRs-777",
+        "thief_group": "orcai-mj",
+        "board_size": [
+          8,
+          8
+        ],
+        "max_moves": 25,
+        "start_positions": {
+          "cop": [
+            0,
+            0
+          ],
+          "thief": [
+            7,
+            7
+          ]
+        },
+        "final_positions": {
+          "cop": [
+            2,
+            2
+          ],
+          "thief": [
+            4,
+            7
+          ]
+        },
+        "winner_role": "thief",
+        "winner_group": "orcai-mj",
+        "move_count": 25,
+        "cop_score": 5,
+        "thief_score": 10,
+        "scores_by_group": {
+          "MaRs-777": 5,
+          "orcai-mj": 10
+        },
+        "barriers": [],
+        "event_count": 25,
+        "transcript_summary": {
+          "message_count": 25,
+          "first_message": "Thief here. From (7, 7) I slip away N. MOVE to (6, 7).",
+          "last_message": "Thief here. From (3, 7) I slip away S. MOVE to (4, 7)."
+        },
+        "outcome_reason": "thief_survived_max_moves",
+        "error": null
+      },
+      {
+        "sub_game_index": 1,
+        "pairing": "A",
+        "cop_group": "MaRs-777",
+        "thief_group": "orcai-mj",
+        "board_size": [
+          8,
+          8
+        ],
+        "max_moves": 25,
+        "start_positions": {
+          "cop": [
+            0,
+            0
+          ],
+          "thief": [
+            7,
+            7
+          ]
+        },
+        "final_positions": {
+          "cop": [
+            2,
+            2
+          ],
+          "thief": [
+            4,
+            7
+          ]
+        },
+        "winner_role": "thief",
+        "winner_group": "orcai-mj",
+        "move_count": 25,
+        "cop_score": 5,
+        "thief_score": 10,
+        "scores_by_group": {
+          "MaRs-777": 5,
+          "orcai-mj": 10
+        },
+        "barriers": [],
+        "event_count": 25,
+        "transcript_summary": {
+          "message_count": 25,
+          "first_message": "Thief here. From (7, 7) I slip away N. MOVE to (6, 7).",
+          "last_message": "Thief here. From (3, 7) I slip away S. MOVE to (4, 7)."
+        },
+        "outcome_reason": "thief_survived_max_moves",
+        "error": null
+      },
+      {
+        "sub_game_index": 2,
+        "pairing": "A",
+        "cop_group": "MaRs-777",
+        "thief_group": "orcai-mj",
+        "board_size": [
+          8,
+          8
+        ],
+        "max_moves": 25,
+        "start_positions": {
+          "cop": [
+            0,
+            0
+          ],
+          "thief": [
+            7,
+            7
+          ]
+        },
+        "final_positions": {
+          "cop": [
+            2,
+            2
+          ],
+          "thief": [
+            7,
+            4
+          ]
+        },
+        "winner_role": "thief",
+        "winner_group": "orcai-mj",
+        "move_count": 25,
+        "cop_score": 5,
+        "thief_score": 10,
+        "scores_by_group": {
+          "MaRs-777": 5,
+          "orcai-mj": 10
+        },
+        "barriers": [],
+        "event_count": 25,
+        "transcript_summary": {
+          "message_count": 25,
+          "first_message": "Thief here. From (7, 7) I slip away W. MOVE to (7, 6).",
+          "last_message": "Thief here. From (7, 3) I slip away E. MOVE to (7, 4)."
+        },
+        "outcome_reason": "thief_survived_max_moves",
+        "error": null
+      },
+      {
+        "sub_game_index": 3,
+        "pairing": "B",
+        "cop_group": "orcai-mj",
+        "thief_group": "MaRs-777",
+        "board_size": [
+          8,
+          8
+        ],
+        "max_moves": 25,
+        "start_positions": {
+          "cop": [
+            0,
+            0
+          ],
+          "thief": [
+            7,
+            7
+          ]
+        },
+        "final_positions": {
+          "cop": [
+            0,
+            7
+          ],
+          "thief": [
+            0,
+            7
+          ]
+        },
+        "winner_role": "cop",
+        "winner_group": "orcai-mj",
+        "move_count": 14,
+        "cop_score": 20,
+        "thief_score": 5,
+        "scores_by_group": {
+          "orcai-mj": 20,
+          "MaRs-777": 5
+        },
+        "barriers": [],
+        "event_count": 21,
+        "transcript_summary": {
+          "message_count": 14,
+          "first_message": "I cannot see the cop right now; I am staying cautious and exploring.",
+          "last_message": "Cop here. From (1, 6) I advance NE. MOVE to (0, 7)."
+        },
+        "outcome_reason": "capture",
+        "error": null
+      },
+      {
+        "sub_game_index": 4,
+        "pairing": "B",
+        "cop_group": "orcai-mj",
+        "thief_group": "MaRs-777",
+        "board_size": [
+          8,
+          8
+        ],
+        "max_moves": 25,
+        "start_positions": {
+          "cop": [
+            0,
+            0
+          ],
+          "thief": [
+            7,
+            7
+          ]
+        },
+        "final_positions": {
+          "cop": [
+            0,
+            7
+          ],
+          "thief": [
+            0,
+            7
+          ]
+        },
+        "winner_role": "cop",
+        "winner_group": "orcai-mj",
+        "move_count": 14,
+        "cop_score": 20,
+        "thief_score": 5,
+        "scores_by_group": {
+          "orcai-mj": 20,
+          "MaRs-777": 5
+        },
+        "barriers": [],
+        "event_count": 21,
+        "transcript_summary": {
+          "message_count": 14,
+          "first_message": "I cannot see the cop right now; I am staying cautious and exploring.",
+          "last_message": "Cop here. From (1, 6) I advance NE. MOVE to (0, 7)."
+        },
+        "outcome_reason": "capture",
+        "error": null
+      },
+      {
+        "sub_game_index": 5,
+        "pairing": "B",
+        "cop_group": "orcai-mj",
+        "thief_group": "MaRs-777",
+        "board_size": [
+          8,
+          8
+        ],
+        "max_moves": 25,
+        "start_positions": {
+          "cop": [
+            0,
+            0
+          ],
+          "thief": [
+            7,
+            7
+          ]
+        },
+        "final_positions": {
+          "cop": [
+            0,
+            7
+          ],
+          "thief": [
+            0,
+            7
+          ]
+        },
+        "winner_role": "cop",
+        "winner_group": "orcai-mj",
+        "move_count": 14,
+        "cop_score": 20,
+        "thief_score": 5,
+        "scores_by_group": {
+          "orcai-mj": 20,
+          "MaRs-777": 5
+        },
+        "barriers": [],
+        "event_count": 21,
+        "transcript_summary": {
+          "message_count": 14,
+          "first_message": "I cannot see the cop right now; I am staying cautious and exploring.",
+          "last_message": "Cop here. From (1, 6) I advance NE. MOVE to (0, 7)."
+        },
+        "outcome_reason": "capture",
+        "error": null
+      }
+    ],
+    "totals_by_group": {
+      "MaRs-777": {
+        "score": 30,
+        "wins": 0,
+        "as_cop_score": 15,
+        "as_thief_score": 15
+      },
+      "orcai-mj": {
+        "score": 90,
+        "wins": 6,
+        "as_cop_score": 60,
+        "as_thief_score": 30
+      }
+    },
+    "bonus_claim": false,
+    "mutual_agreement": false,
+    "partner_confirmation_status": "pending",
+    "agreement_notes": "Official 6-sub-game bonus game played autonomously by the MCP agents; awaiting partner confirmation that the canonical result matches before mutual_agreement is set.",
+    "generated_at_iso": "2026-06-25T19:32:37.313018+03:00",
+    "validation_status": "valid"
+  },
+  "tokens_recorded": false,
+  "student_ids_redacted": true
+}
